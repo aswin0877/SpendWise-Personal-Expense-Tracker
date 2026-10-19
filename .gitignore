@@ -1,0 +1,13 @@
+# Maven build output
+/target/
+
+# NetBeans user-specific settings
+/nbproject/private/
+
+# Local secrets / environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log

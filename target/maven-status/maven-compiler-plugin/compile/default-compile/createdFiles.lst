@@ -1,0 +1,17 @@
+com\spendwise\spendwise\SpendWise.class
+com\spendwise\model\Expense.class
+com\spendwise\gui\RegisterFrame.class
+com\spendwise\service\TransactionService.class
+com\spendwise\gui\DashboardFrame$2.class
+com\spendwise\database\DatabaseManager.class
+com\spendwise\gui\DashboardFrame$1.class
+com\spendwise\model\TransactionOperations.class
+com\spendwise\util\PasswordUtil.class
+com\spendwise\model\Income.class
+com\spendwise\gui\DashboardFrame.class
+com\spendwise\service\BudgetService.class
+com\spendwise\model\Budget.class
+com\spendwise\gui\DashboardFrame$3.class
+com\spendwise\gui\LoginFrame.class
+com\spendwise\model\Transaction.class
+com\spendwise\service\AuthService.class

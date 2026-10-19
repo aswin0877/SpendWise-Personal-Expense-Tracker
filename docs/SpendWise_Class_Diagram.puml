@@ -1,0 +1,155 @@
+@startuml SpendWise_Class_Diagram
+left to right direction
+skinparam backgroundColor #F8FAFC
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #475569
+  ArrowColor #475569
+}
+skinparam package {
+  BackgroundColor #EFF6FF
+  BorderColor #94A3B8
+  FontColor #1E3A8A
+}
+
+package "Application" {
+  class SpendWise {
+    {static} +main(args: String[]): void
+  }
+}
+package "GUI Layer" {
+  class LoginFrame {
+    -emailField: JTextField
+    -passwordField: JPasswordField
+    -authService: AuthService
+    +LoginFrame()
+    -createUI(): void
+    -login(): void
+  }
+  class RegisterFrame {
+    -nameField: JTextField
+    -emailField: JTextField
+    -passwordField: JPasswordField
+    -confirmField: JPasswordField
+    -authService: AuthService
+    +RegisterFrame()
+    -createUI(): void
+    -register(): void
+  }
+  class DashboardFrame {
+    -service: TransactionService
+    -userId: int
+    -budgetService: BudgetService
+    -transactionTable: JTable
+    +DashboardFrame(userId: int)
+    -loadTransactions(): void
+    -addTransaction(): void
+    -editTransaction(): void
+    -deleteTransaction(): void
+    -loadBudgetSummary(): void
+    -setMonthlyBudget(): void
+    -logout(): void
+  }
+}
+package "Service Layer" {
+  class AuthService {
+    +register(name: String, email: String, password: char[]): int
+    +login(email: String, password: char[]): int
+  }
+  class TransactionService {
+    -userId: int
+    +TransactionService(userId: int)
+    +addTransaction(transaction: Transaction): void throws SQLException
+    +viewTransactions(): List<Transaction> throws SQLException
+    +updateTransaction(transaction: Transaction): void throws SQLException
+    +deleteTransaction(transactionId: int): void throws SQLException
+  }
+  class BudgetService {
+    +saveBudget(budget: Budget): void throws SQLException
+    +getBudget(userId: int, month: int, year: int): double
+    +getMonthlyExpenses(userId: int, month: int, year: int): double
+    +getRemainingBudget(userId: int, month: int, year: int): double
+  }
+}
+package "Model Layer" {
+  interface TransactionOperations {
+    +addTransaction(transaction: Transaction): void throws SQLException
+    +viewTransactions(): List<Transaction> throws SQLException
+    +updateTransaction(transaction: Transaction): void throws SQLException
+    +deleteTransaction(transactionId: int): void throws SQLException
+  }
+  abstract class Transaction {
+    -transactionId: int
+    -amount: double
+    -category: String
+    -transactionDate: LocalDate
+    -description: String
+    +getTransactionType(): String {abstract}
+    +getAmount(): double
+    +getCategory(): String
+    +getTransactionDate(): LocalDate
+    +getDescription(): String
+  }
+  class Income {
+    +Income(amount: double, category: String, date: LocalDate, description: String)
+    +getTransactionType(): String
+  }
+  class Expense {
+    +Expense(amount: double, category: String, date: LocalDate, description: String)
+    +getTransactionType(): String
+  }
+  class Budget {
+    -budgetId: int
+    -userId: int
+    -month: int
+    -year: int
+    -limitAmount: double
+    +Budget(userId: int, month: int, year: int, limitAmount: double)
+    +getBudgetId(): int
+    +getLimitAmount(): double
+    +setLimitAmount(limitAmount: double): void
+  }
+}
+package "Utility & Database" {
+  class PasswordUtil <<utility>> {
+    {static} +hashPassword(password: char[]): String
+    {static} +verifyPassword(password: char[], storedValue: String): boolean
+    {static} -generateHash(password: char[], salt: byte[]): byte[]
+  }
+  class DatabaseManager {
+    {static} -URL: String
+    {static} -USER: String
+    {static} -PASSWORD: String
+    {static} +getConnection(): Connection throws SQLException
+    {static} +main(args: String[]): void
+  }
+}
+
+LoginFrame --|> JFrame\nRegisterFrame --|> JFrame\nDashboardFrame --|> JFrame\nSpendWise ..> LoginFrame : SwingUtilities.invokeLater
+LoginFrame ..> RegisterFrame : opens
+LoginFrame ..> AuthService : login()
+LoginFrame ..> DashboardFrame : opens after login
+RegisterFrame ..> AuthService : register()
+DashboardFrame ..> TransactionService : transactions
+DashboardFrame ..> BudgetService : budgets
+TransactionService ..|> TransactionOperations
+TransactionService ..> Transaction : reads / writes
+Income --|> Transaction
+Expense --|> Transaction
+BudgetService ..> Budget : saves / reads
+AuthService ..> PasswordUtil : hash / verify
+AuthService ..> DatabaseManager : JDBC
+TransactionService ..> DatabaseManager : JDBC
+BudgetService ..> DatabaseManager : JDBC
+note bottom of SpendWise
+  main() creates LoginFrame on the Swing event dispatch thread.
+end note
+@enduml
+
